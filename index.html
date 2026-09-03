@@ -336,7 +336,7 @@
 <div class="container">
     <h2>Control Financiero</h2>
 
-    <!-- Desglose de Ingresos (usando oninput para guardado instantáneo) -->
+    <!-- Desglose de Ingresos -->
     <div class="income-breakdown">
         <div class="income-row">
             <span>🎫 Vales ($):</span>
@@ -494,7 +494,7 @@
         const savedOtro = localStorage.getItem('wallet_otro_v5');
         
         if (savedItems) items = JSON.parse(savedItems);
-        if (savedBudget) document.getElementById('budgetInput').value = savedBudget;
+        if (savedBudget !== null) document.getElementById('budgetInput').value = savedBudget;
         if (savedVales !== null) document.getElementById('valesInput').value = savedVales;
         if (savedSueldo !== null) document.getElementById('sueldoInput').value = savedSueldo;
         if (savedOtro !== null) document.getElementById('otroInput').value = savedOtro;
@@ -593,4 +593,5 @@
             return;
         }
 
-    
+        if (isWalmart) {
+            p
