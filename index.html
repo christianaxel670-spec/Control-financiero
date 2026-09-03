@@ -188,6 +188,18 @@
             font-weight: bold;
             cursor: pointer;
         }
+        button.manual-save-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
         button.finish-btn {
             width: 100%;
             padding: 12px;
@@ -324,19 +336,19 @@
 <div class="container">
     <h2>Control Financiero</h2>
 
-    <!-- Desglose de Ingresos -->
+    <!-- Desglose de Ingresos (usando oninput para guardado instantáneo) -->
     <div class="income-breakdown">
         <div class="income-row">
             <span>🎫 Vales ($):</span>
-            <input type="number" id="valesInput" value="0" onchange="updateValues()" step="10">
+            <input type="number" id="valesInput" value="0" oninput="updateValues()" step="10">
         </div>
         <div class="income-row">
             <span>💼 Sueldo ($):</span>
-            <input type="number" id="sueldoInput" value="1000" onchange="updateValues()" step="10">
+            <input type="number" id="sueldoInput" value="1000" oninput="updateValues()" step="10">
         </div>
         <div class="income-row">
             <span>✨ Otro ($):</span>
-            <input type="number" id="otroInput" value="0" onchange="updateValues()" step="10">
+            <input type="number" id="otroInput" value="0" oninput="updateValues()" step="10">
         </div>
         <div class="income-total">
             <span>Total Ingresos:</span>
@@ -347,7 +359,7 @@
     <!-- Fondo Base -->
     <div class="card-panel">
         <span>Fondo Base ($):</span>
-        <input type="number" id="budgetInput" value="0" onchange="updateValues()" step="10">
+        <input type="number" id="budgetInput" value="0" oninput="updateValues()" step="10">
     </div>
 
     <!-- Cajita de Ahorro -->
@@ -362,6 +374,9 @@
         <div>Ahorros: <span id="totalSavedSum" class="savings-color">$0.00</span></div>
         <div>Libre: <span id="totalAvailable" class="available">$0.00</span></div>
     </div>
+
+    <!-- Botón de Guardado Manual -->
+    <button class="manual-save-btn" onclick="manualSave()">💾 Guardar Cambios Manualmente</button>
 
     <!-- Apartado de Gastos Mensuales / Servicios -->
     <div class="form-section">
@@ -495,6 +510,11 @@
         localStorage.setItem('wallet_otro_v5', document.getElementById('otroInput').value);
     }
 
+    function manualSave() {
+        saveToLocalStorage();
+        alert('¡Datos guardados correctamente en la memoria del teléfono!');
+    }
+
     function addService(serviceName) {
         const amountInput = document.getElementById('serviceAmount');
         const sourceSelect = document.getElementById('serviceIncomeSource');
@@ -573,26 +593,4 @@
             return;
         }
 
-        if (isWalmart) {
-            price = price * 0.90; // 10% descuento Walmart
-        }
-
-        const now = new Date();
-        const fechaStr = now.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit' });
-
-        items.push({ 
-            name: name, 
-            price: price, 
-            store: store, 
-            category: category,
-            source: source,
-            isWalmart: isWalmart,
-            date: fechaStr,
-            isSavings: false
-        });
-        
-        nameInput.value = '';
-        priceInput.value = '';
-        storeInput.value = '';
-        categorySelect.selectedIndex = 0;
-        walmartCheck.checked = f
+    
