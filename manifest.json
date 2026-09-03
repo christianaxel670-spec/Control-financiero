@@ -1,0 +1,15 @@
+{
+  "name": "Control Financiero",
+  "short_name": "Finanzas",
+  "start_url": "/Control-financiero/",
+  "display": "standalone",
+  "background_color": "#2C3E50",
+  "theme_color": "#2C3E50",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
