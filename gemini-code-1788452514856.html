@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Financiero por Ingresos</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border: #2d2d2d;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 12px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 440px;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .card-panel {
+            background: #252528;
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        .card-panel.income {
+            background: #132f20;
+            border-left-color: var(--success);
+        }
+        .card-panel.savings-box {
+            background: #332711;
+            border-left-color: var(--warning);
+        }
+        .card-panel input {
+            width: 110px;
+            padding: 6px;
+            font-size: 14px;
+            text-align: right;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #18181b;
+            color: var(--text-primary);
+        }
+
+        .income-breakdown {
+            background: #18181b;
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .income-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--success);
+        }
+        .income-row input {
+            width: 110px;
+            padding: 6px;
+            font-size: 14px;
+            text-align: right;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #27272a;
+            color: var(--text-primary);
+        }
+        .income-total {
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--success);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 14px 0;
+            font-size: 11px;
+            font-weight: bold;
+            background: #18181b;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+        }
+        .spent { color: var(--danger); }
+        .savings-color { color: var(--warning); }
+        .available { color: var(--primary); }
+        
+        .form-section {
+            background: #18181b;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+        }
+        .form-section h3 {
+            font-size: 13px;
+            margin: 0 0 10px 0;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #27272a;
+            color: var(--text-primary);
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .grid-services {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        button.service-btn {
+            padding: 10px;
+            background-color: #27272a;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button.service-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .walmart-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            background: #132f20;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #1e4620;
+        }
+        .walmart-container label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--success);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .walmart-container input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--success);
+            cursor: pointer;
+        }
+
+        button.add-btn, button.save-btn, button.manual-save-btn, button.finish-btn {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        button.add-btn { background-color: var(--success); color: white; }
+        button.save-btn { background-color: var(--warning); color: #121212; }
+        button.manual-save-btn { background-color: var(--primary); color: white; margin-bottom: 12px; }
+        button.finish-btn { background-color: #d97706; color: white; margin-top: 10px; }
+        button:hover { opacity: 0.9; }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .date-header {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-secondary);
+            background: #27272a;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin: 12px 0 6px 0;
+            text-transform: uppercase;
+        }
+        li {
+            background: #27272a;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+            flex: 1;
+        }
+        .item-name {
+            font-weight: bold;
+            font-size: 13px;
+            word-break: break-word;
+        }
+        .item-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .item-store, .item-category, .item-source {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .item-store { color: var(--text-secondary); background: #3f3f46; }
+        .item-category { color: #c084fc; background: #3b2854; }
+        .item-source { color: var(--success); background: #132f20; font-weight: bold; }
+        .item-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 9px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        /* Modal del Ticket */
+        #ticketModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            z-index: 100;
+        }
+        .ticket-box {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            max-height: 90vh;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+        .ticket-header {
+            text-align: center;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        .ticket-header h3 { margin: 0 0 4px 0; font-size: 16px; }
+        .ticket-header p { margin: 0; font-size: 12px; color: var(--text-secondary); }
+        .ticket-items {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+        .ticket-items th { text-align: left; border-bottom: 1px solid var(--border); padding-bottom: 6px; color: var(--text-secondary); }
+        .ticket-items td { padding: 8px 0; border-bottom: 1px dotted var(--border); word-break: break-word; }
+        .ticket-summary {
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+            font-size: 12px;
+        }
+        .ticket-summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .close-ticket-btn {
+            background: #3f3f46;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Control Financiero</h2>
+
+    <!-- Desglose de Ingresos -->
+    <div class="income-breakdown">
+        <div class="income-row">
+            <span>🎫 Vales ($):</span>
+            <input type="number" id="valesInput" value="0" oninput="updateValues()" onkeyup="updateValues()" step="10">
+        </div>
+        <div class="income-row">
+            <span>💼 Sueldo ($):</span>
+            <input type="number" id="sueldoInput" value="1000" oninput="updateValues()" onkeyup="updateValues()" step="10">
+        </div>
+        <div class="income-row">
+            <span>✨ Otro ($):</span>
+            <input type="number" id="otroInput" value="0" oninput="updateValues()" onkeyup="updateValues()" step="10">
+        </div>
+        <div class="income-total">
+            <span>Total Ingresos:</span>
+            <span id="totalIncomeDisplay">$1000.00</span>
+        </div>
+    </div>
+
+    <!-- Fondo Base -->
+    <div class="card-panel">
+        <span>Fondo Base ($):</span>
+        <input type="number" id="budgetInput" value="0" oninput="updateValues()" onkeyup="updateValues()" step="10">
+    </div>
+
+    <!-- Cajita de Ahorro -->
+    <div class="card-panel savings-box">
+        <span>📦 Cajita Ahorro:</span>
+        <span id="totalSavingsDisplay" style="font-weight: bold; color: var(--warning); font-size: 15px;">$0.00</span>
+    </div>
+
+    <!-- Resumen Acumulado -->
+    <div class="summary">
+        <div>Gastos:<br><span id="totalSpent" class="spent">$0.00</span></div>
+        <div>Ahorros:<br><span id="totalSavedSum" class="savings-color">$0.00</span></div>
+        <div>Libre:<br><span id="totalAvailable" class="available">$0.00</span></div>
+    </div>
+
+    <!-- Botón de Guardado Manual -->
+    <button class="manual-save-btn" onclick="manualSave()">💾 Guardar Cambios Manualmente</button>
+
+    <!-- Apartado de Gastos Mensuales / Servicios -->
+    <div class="form-section">
+        <h3>Gastos Mensuales / Servicios</h3>
+        <div class="form-group">
+            <input type="number" id="serviceAmount" placeholder="Monto del servicio ($)" step="1">
+        </div>
+        <div class="form-group">
+            <select id="serviceIncomeSource">
+                <option value="Sueldo" selected>Descontar de: Sueldo</option>
+                <option value="Vales">Descontar de: Vales</option>
+                <option value="Otro">Descontar de: Otro</option>
+            </select>
+        </div>
+        <div class="grid-services">
+            <button class="service-btn" onclick="addService('Agua')">💧 Agua</button>
+            <button class="service-btn" onclick="addService('Luz')">⚡ Luz</button>
+            <button class="service-btn" onclick="addService('Internet')">🌐 Internet</button>
+            <button class="service-btn" onclick="addService('Renta')">🏠 Renta</button>
+        </div>
+    </div>
+
+    <!-- Apartado para Ahorrar -->
+    <div class="form-section">
+        <h3>Guardar en Cajita de Ahorro</h3>
+        <div class="form-group">
+            <input type="number" id="saveAmount" placeholder="Cantidad a apartar ($)" step="5">
+        </div>
+        <div class="form-group">
+            <select id="saveIncomeSource">
+                <option value="Sueldo" selected>Ahorrar desde: Sueldo</option>
+                <option value="Vales">Ahorrar desde: Vales</option>
+                <option value="Otro">Ahorrar desde: Otro</option>
+            </select>
+        </div>
+        <button class="save-btn" onclick="addSavings()">📥 Guardar en Ahorros</button>
+    </div>
+
+    <!-- Formulario para Compras / Gastos Diarios -->
+    <div class="form-section">
+        <h3>Registrar Gasto Diario</h3>
+        <div class="form-group">
+            <input type="text" id="itemName" placeholder="Nombre de lo que compraste...">
+        </div>
+        <div class="form-group">
+            <input type="number" id="itemPrice" placeholder="Precio ($)" step="0.5">
+        </div>
+        <div class="form-group">
+            <input type="text" id="itemStore" placeholder="Tienda (Ej. Walmart, Oxxo)...">
+        </div>
+        <div class="form-group">
+            <select id="itemCategory">
+                <option value="" disabled selected>Selecciona tipo de gasto...</option>
+                <option value="Salud">Salud</option>
+                <option value="Cuidado personal">Cuidado personal</option>
+                <option value="Despensa">Despensa</option>
+                <option value="Gustito">Gustito</option>
+                <option value="Servicio">Servicio</option>
+                <option value="Ahorro">Ahorro</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <select id="itemIncomeSource">
+                <option value="Sueldo" selected>Gastando de: Sueldo</option>
+                <option value="Vales">Gastando de: Vales</option>
+                <option value="Otro">Gastando de: Otro</option>
+            </select>
+        </div>
+        <div class="walmart-container">
+            <label>
+                <input type="checkbox" id="walmartCheck"> Comprado en Walmart (-10% desc.)
+            </label>
+        </div>
+        <button class="add-btn" onclick="addItem()">Agregar Gasto</button>
+    </div>
+
+    <!-- Lista Acumulada -->
+    <ul id="itemList"></ul>
+
+    <!-- Botón Resumen General -->
+    <button class="finish-btn" onclick="generateTicket()">🎫 Ver Resumen y Totales</button>
+</div>
+
+<!-- Modal del Resumen -->
+<div id="ticketModal">
+    <div class="ticket-box">
+        <div class="ticket-header">
+            <h3>RESUMEN DE FINANZAS</h3>
+            <p id="ticketDate"></p>
+        </div>
+        <table class="ticket-items">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                    <th style="text-align:right;">Monto</th>
+                </tr>
+            </thead>
+            <tbody id="ticketTableBody"></tbody>
+        </table>
+        <div class="ticket-summary" id="ticketSummaryContent"></div>
+        <button class="close-ticket-btn" onclick="closeTicket()">Cerrar</button>
+    </div>
+</div>
+
+<script>
+    let items = [];
+
+    window.onload = function() {
+        const savedItems = localStorage.getItem('wallet_items_v5');
+        const savedBudget = localStorage.getItem('wallet_budget_v5');
+        const savedVales = localStorage.getItem('wallet_vales_v5');
+        const savedSueldo = localStorage.getItem('wallet_sueldo_v5');
+        const savedOtro = localStorage.getItem('wallet_otro_v5');
+        
+        if (savedItems) items = JSON.parse(savedItems);
+        if (savedBudget !== null) document.getElementById('budgetInput').value = savedBudget;
+        if (savedVales !== null) document.getElementById('valesInput').value = savedVales;
+        if (savedSueldo !== null) document.getElementById('sueldoInput').value = savedSueldo;
+        if (savedOtro !== null) document.getElementById('otroInput').value = savedOtro;
+        
+        renderList();
+    };
+
+    function saveToLocalStorage() {
+        localStorage.setItem('wallet_items_v5', JSON.stringify(items));
+        localStorage.setItem('wallet_budget_v5', document.getElementById('budgetInput').value);
+        localStorage.setItem('wallet_vales_v5', document.getElementById('valesInput').value);
+        localStorage.setItem('wallet_sueldo_v5', document.getElementById('sueldoInput').value);
+        localStorage.setItem('wallet_otro_v5', document.getElementById('otroInput').value);
+    }
+
+    function manualSave() {
+        saveToLocalStorage();
+        alert('¡Datos guardados correctamente en la memoria del teléfono!');
+    }
+
+    function addService(serviceName) {
+        const amountInput = document.getElementById('serviceAmount');
+        const sourceSelect = document.getElementById('serviceIncomeSource');
+        let amount = parseFloat(amountInput.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            alert(`Ingresa una cantidad válida para pagar ${serviceName}.`);
+            return;
+        }
+
+        const now = new Date();
+        const fechaStr = now.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        items.push({
+            name: `Servicio: ${serviceName}`,
+            price: amount,
+            store: 'Pago Fijo',
+            category: 'Servicio',
+            source: sourceSelect.value,
+            isWalmart: false,
+            date: fechaStr,
+            isSavings: false
+        });
+
+        amountInput.value = '';
+        saveToLocalStorage();
+        renderList();
+    }
+
+    function addSavings() {
+        const saveInput = document.getElementById('saveAmount');
+        const sourceSelect = document.getElementById('saveIncomeSource');
+        let amount = parseFloat(saveInput.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            alert('Ingresa una cantidad válida para ahorrar.');
+            return;
+        }
+
+        const now = new Date();
+        const fechaStr = now.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        items.push({ 
+            name: '📦 Ahorro a cajita', 
+            price: amount, 
+            store: 'Mi Alcancía', 
+            category: 'Ahorro',
+            source: sourceSelect.value,
+            isWalmart: false,
+            date: fechaStr,
+            isSavings: true
+        });
+
+        saveInput.value = '';
+        saveToLocalStorage();
+        renderList();
+    }
+
+    function addItem() {
+        const nameInput = document.getElementById('itemName');
+        const priceInput = document.getElementById('itemPrice');
+        const storeInput = document.getElementById('itemStore');
+        const categorySelect = document.getElementById('itemCategory');
+        const sourceSelect = document.getElementById('itemIncomeSource');
+        const walmartCheck = document.getElementById('walmartCheck');
+        
+        const name = nameInput.value.trim();
+        let price = parseFloat(priceInput.value);
+        const store = storeInput.value.trim() || 'Desconocida';
+        const category = categorySelect.value || 'Otro';
+        const source = sourceSelect.value;
+        const isWalmart = walmartCheck.checked;
+
+        if (name === '' || isNaN(price) || price <= 0) {
+            alert('Ingresa un nombre y un precio válido.');
+            return;
+        }
+
+        if (isWalmart) {
+            price = price * 0.90; // 10% descuento Walmart
+        }
+
+        const now = new Date();
+        const fechaStr = now.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        items.push({ 
+            name: name, 
+            price: price, 
+            store: store, 
+            category: category,
+            source: source,
+            isWalmart: isWalmart,
+            date: fechaStr,
+            isSavings: false
+        });
+        
+        nameInput.value = '';
+        priceInput.value = '';
+        storeInput.value = '';
+        categorySelect.selectedIndex = 0;
+        walmartCheck.checked = false;
+        nameInput.focus();
+
+        saveToLocalStorage();
+        renderList();
+    }
+
+    function deleteItem(originalIndex) {
+        items.splice(originalIndex, 1);
+        saveToLocalStorage();
+        renderList();
+    }
+
+    function renderList() {
+        const listElement = document.getElementById('itemList');
+        listElement.innerHTML = '';
+
+        let totalSpent = 0;
+        let totalSaved = 0;
+
+        items.forEach((item) => {
+            if (item.isSavings) totalSaved += item.price;
+            else totalSpent += item.price;
+        });
+
+        let groupedByDate = {};
+        items.forEach((item, originalIndex) => {
+            const dateKey = item.date || 'Sin fecha';
+            if (!groupedByDate[dateKey]) {
+                groupedByDate[dateKey] = [];
+            }
+            groupedByDate[dateKey].push({ item, originalIndex });
+        });
+
+        for (let dateKey in groupedByDate) {
+            const dateHeader = document.createElement('div');
+            dateHeader.className = 'date-header';
+            dateHeader.innerText = `📅 ${dateKey}`;
+            listElement.appendChild(dateHeader);
+
+            groupedByDate[dateKey].forEach(({ item, originalIndex }) => {
+                const li = document.createElement('li');
+                li.style.background = item.isSavings ? '#332711' : '#27272a';
+                li.innerHTML = `
+                    <div class="item-info">
+                        <span class="item-name">${item.name}</span>
+                        <div class="item-meta">
+                            <span class="item-store">🏪 ${item.store}</span>
+                            <span class="item-category" style="${item.isSavings ? 'background:#45310a; color:#fde047;' : ''}">📁 ${item.category}</span>
+                            <span class="item-source">💳 ${item.source || 'Sueldo'}</span>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span style="color: ${item.isSavings ? 'var(--warning)' : 'var(--text-primary)'};"><b>$${item.price.toFixed(2)}</b></span>
+                        <button class="delete-btn" onclick="deleteItem(${originalIndex})">✕</button>
+                    </div>
+                `;
+                listElement.appendChild(li);
+            });
+        }
+
+        const vales = parseFloat(document.getElementById('valesInput').value) || 0;
+        const sueldo = parseFloat(document.getElementById('sueldoInput').value) || 0;
+        const otro = parseFloat(document.getElementById('otroInput').value) || 0;
+        const totalIncome = vales + sueldo + otro;
+        const budget = parseFloat(document.getElementById('budgetInput').value) || 0;
+
+        document.getElementById('totalIncomeDisplay').innerText = `$${totalIncome.toFixed(2)}`;
+
+        const totalAvailable = (totalIncome + budget) - (totalSpent + totalSaved);
+
+        document.getElementById('totalSpent').innerText = `$${totalSpent.toFixed(2)}`;
+        document.getElementById('totalSavedSum').innerText = `$${totalSaved.toFixed(2)}`;
+        document.getElementById('totalSavingsDisplay').innerText = `$${totalSaved.toFixed(2)}`;
+        
+        const availableElement = document.getElementById('totalAvailable');
+        availableElement.innerText = `$${totalAvailable.toFixed(2)}`;
+        availableElement.style.color = totalAvailable < 0 ? 'var(--danger)' : 'var(--primary)';
+    }
+
+    function updateValues() {
+        saveToLocalStorage();
+        renderList();
+    }
+
+    function generateTicket() {
+        if (items.length === 0) {
+            alert('No hay movimientos registrados todavía.');
+            return;
+        }
+
+        const now = new Date();
+        document.getElementById('ticketDate').innerText = now.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        const tbody = document.getElementById('ticketTableBody');
+        tbody.innerHTML = '';
+
+        let totalSpent = 0;
+        let totalSaved = 0;
+        let spentVales = 0, spentSueldo = 0, spentOtro = 0;
+
+        items.forEach(item => {
+            if (item.isSavings) totalSaved += item.price;
+            else totalSpent += item.price;
+
+            const src = item.source || 'Sueldo';
+            if (src === 'Vales') spentVales += item.price;
+            else if (src === 'Sueldo') spentSueldo += item.price;
+            else if (src === 'Otro') spentOtro += item.price;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${item.name}</b><br><small style="color:var(--text-secondary);">[${item.category}] - 💳 ${src} (${item.date})</small></td>
+                <td><small style="color:var(--text-secondary);">${item.store}</small></td>
+                <td style="text-align:right; color:${item.isSavings ? 'var(--warning)' : 'var(--text-primary)'};">$${item.price.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const vales = parseFloat(document.getElementById('valesInput').value) || 0;
+        const sueldo = parseFloat(document.getElementById('sueldoInput').value) || 0;
+        const otro = parseFloat(document.getElementById('otroInput').value) || 0;
+        const totalIncome = vales + sueldo + otro;
+        const budget = parseFloat(document.getElementById('budgetInput').value) || 0;
+        const totalAvailable = (totalIncome + budget) - (totalSpent + totalSaved);
+
+        const summaryDiv = document.getElementById('ticketSummaryContent');
+        summaryDiv.innerHTML = `
+            <div><span>Total Ingresos:</span> <b>$${totalIncome.toFixed(2)}</b></div>
+            <div><span>- Vales (Resto):</span> <b>$${(vales - spentVales).toFixed(2)}</b></div>
+            <div><span>- Sueldo (Resto):</span> <b>$${(sueldo - spentSueldo).toFixed(2)}</b></div>
+            <div><span>- Otro (Resto):</span> <b>$${(otro - spentOtro).toFixed(2)}</b></div>
+            <hr style="border:0; border-top:1px dashed var(--border); margin:6px 0;">
+            <div><span>Fondo Base:</span> <b>$${budget.toFixed(2)}</b></div>
+            <div><span>Total Gastos:</span> <b style="color:var(--danger);">$${totalSpent.toFixed(2)}</b></div>
+            <div><span>Total en Ahorros:</span> <b style="color:var(--warning);">$${totalSaved.toFixed(2)}</b></div>
+            <div><span>Disponible Total:</span> <b style="color:${totalAvailable >= 0 ? 'var(--primary)' : 'var(--danger)'};">$${totalAvailable.toFixed(2)}</b></div>
+        `;
+
+        document.getElementById('ticketModal').style.display = 'flex';
+    }
+
+    function closeTicket() {
+        document.getElementById('ticketModal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
